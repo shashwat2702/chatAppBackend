@@ -24,5 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     emailAddress: inputEmail,
     password: inputPassword,
   }).then(response => response);
+  user.isUserNameTaken = inputUserName => user.findOne({ where: { username: inputUserName } })
+    .then(response => response);
   return user;
 };
