@@ -50,4 +50,24 @@ describe('All Functions related to users table', () => {
       expect(result).toEqual(null);
     });
   });
+
+  describe('checkLogin ()', () => {
+    const username = 'User@1';
+    const name = 'Test User';
+    const email = 'test@mail.com';
+    const password = 'Password';
+    beforeEach(async () => {
+      await model.user.truncate();
+    });
+    it('should return user details if user already exists', async () => {
+      await model.user.registerUser(username, name, email, password);
+      const result = await model.user.checkLogin(email, password);
+      expect(result.username).toEqual(username);
+    });
+    it('should return null when user does not exists', async () => {
+      await model.user.registerUser(username, name, email, password);
+      const result = await model.user.checkLogin(`${email}2`, password);
+      expect(result).toEqual(null);
+    });
+  });
 });

@@ -1,49 +1,49 @@
 const { server } = require('./../../../src/server');
 const model = require('../../../models');
 
-describe('Test for /register route', () => {
+describe('Test for /login route', () => {
   beforeEach(async () => {
     await model.user.truncate();
+    const username = 'User@1';
+    const name = 'Test User';
+    const email = 'test@mail.com';
+    const password = 'Password';
+    await model.user.registerUser(username, name, email, password);
   });
   afterAll(async () => {
     model.sequelize.close();
   });
-  it('should return userName when user is successfully registered', async () => {
+  it('should return "Authenticated" when user credentials are correct', async () => {
     const options = {
       method: 'POST',
-      url: '/register',
+      url: '/login',
       payload: {
-        userName: 'User@1',
-        name: 'Test User',
         email: 'test@mail.com',
         password: 'Password',
       },
     };
     const response = await server.inject(options);
     await expect(response.statusCode).toEqual(200);
-    expect(response.result).toEqual(options.payload.userName);
+    expect(response.result).toEqual('Authenticated');
   });
-  it('should return status 404 for wrong route', async () => {
+  it('should return status 401 for wrong credentials', async () => {
     const options = {
       method: 'POST',
-      url: '/registr',
+      url: '/login',
       payload: {
-        userName: 'User@1',
-        name: 'Test User',
-        email: 'test@mail.com',
+        email: 'test1@mail.com',
         password: 'Password',
       },
     };
     const response = await server.inject(options);
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(401);
+    expect(response.result).toEqual('Account Not Found');
   });
   it('should return status 500 for missing or wrong parameters', async () => {
     const options = {
       method: 'POST',
-      url: '/register',
+      url: '/login',
       payload: {
-        name: 'Test User',
-        email: 'test@mail.com',
         password: 'Password',
       },
     };

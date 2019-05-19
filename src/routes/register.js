@@ -11,6 +11,6 @@ module.exports = {
     if (registerStatus && registerStatus.username === userName) {
       return h.response(registerStatus.username).code(200);
     }
-    return h.response('Sorry Account Registration Failed').code(202);
+    return h.response('Sorry Account Registration Failed').code(401);
   },
 };
