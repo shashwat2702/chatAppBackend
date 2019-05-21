@@ -36,7 +36,7 @@ describe('Test for /login route', () => {
       },
     };
     const response = await server.inject(options);
-    expect(response.statusCode).toEqual(401);
+    expect(response.statusCode).toEqual(200);
     expect(response.result).toEqual('Account Not Found');
   });
   it('should return status 500 for missing or wrong parameters', async () => {
