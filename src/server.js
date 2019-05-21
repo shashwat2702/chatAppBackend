@@ -8,6 +8,18 @@ const server = Hapi.server({
 });
 
 server.route(routes());
+// eslint-disable-next-line import/order
+const io = require('socket.io')(server.listener);
+
+io.on('connection', (socket) => {
+  console.log('connected', socket.id);
+
+  socket.on('SEND_MESSAGE', (data) => {
+    console.log(data);
+    io.emit('RECEIVE_MESSAGE', data);
+  });
+});
+
 
 const start = async () => {
   try {
@@ -16,7 +28,6 @@ const start = async () => {
     console.log(err);
     process.exit(1);
   }
-
   console.log('Server running at:', server.info.uri);
 };
 
