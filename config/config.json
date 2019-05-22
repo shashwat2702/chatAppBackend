@@ -16,7 +16,7 @@
   "production": {
     "username": "chlffsapnngdjj",
     "password": "04daa572c34b83df2738448b2a260e198c1ee6668653825a6935ec512156ea47",
-    "database": "postgresql-flat-58496",
+    "database": "d9uvrhs4349920",
     "host": "ec2-54-246-92-116.eu-west-1.compute.amazonaws.com",
     "dialect": "postgres"
   }
