@@ -2,8 +2,8 @@ const Hapi = require('@hapi/hapi');
 const routes = require('./routes/index');
 
 const server = Hapi.server({
-  host: 'localhost',
-  port: 8080,
+  host: '0.0.0.0',
+  port: process.env.PORT,
   routes: { cors: true },
 });
 let listOfAllActiveUsers = [];
