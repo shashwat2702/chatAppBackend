@@ -9,8 +9,8 @@ module.exports = {
     } = req.payload;
     const loginStatus = await model.user.checkLogin(email, password);
     if (loginStatus && loginStatus.emailAddress === email) {
-      return h.response('Authenticated').code(200);
+      return h.response({ authentication: 'Authenticated', userName: loginStatus.username }).code(200);
     }
-    return h.response('Account Not Found').code(200);
+    return h.response({ authentication: 'Account Not Found', userName: '' }).code(200);
   },
 };

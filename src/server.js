@@ -6,6 +6,7 @@ const server = Hapi.server({
   port: 8080,
   routes: { cors: true },
 });
+let listOfAllActiveUsers = [];
 
 server.route(routes());
 // eslint-disable-next-line import/order
@@ -13,9 +14,20 @@ const io = require('socket.io')(server.listener);
 
 io.on('connection', (socket) => {
   console.log('connected', socket.id);
+  socket.on('NEW USER', (data) => {
+    if (!listOfAllActiveUsers.includes(data.username)) {
+      listOfAllActiveUsers.push(data.username);
+      io.emit('LIST OF ACTIVE USERS', listOfAllActiveUsers);
+    }
+  });
+
+  socket.on('USER DISCONNECTED', (data) => {
+    console.log('USER DISCONNECTED', data);
+    listOfAllActiveUsers = listOfAllActiveUsers.filter(user => user !== data.username);
+    io.emit('LIST OF ACTIVE USERS', listOfAllActiveUsers);
+  });
 
   socket.on('SEND_MESSAGE', (data) => {
-    console.log(data);
     io.emit('RECEIVE_MESSAGE', data);
   });
 });
