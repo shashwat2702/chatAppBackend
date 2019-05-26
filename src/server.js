@@ -7,29 +7,36 @@ const server = Hapi.server({
   routes: { cors: true },
 });
 let listOfAllActiveUsers = [];
+const onConnect = (socket, io) => {
+  socket.on('NEW USER', (data) => {
+    console.log('NEW USER', data);
+    listOfAllActiveUsers.push(data.username);
+    io.emit('LIST OF ACTIVE USERS', listOfAllActiveUsers);
+  });
+  socket.on('USER DISCONNECTED', (data) => {
+    console.log('USER DISCONNECTED', data);
+    listOfAllActiveUsers = listOfAllActiveUsers.filter(user => user !== data.username);
+    console.log(listOfAllActiveUsers);
+    io.emit('LIST OF ACTIVE USERS', listOfAllActiveUsers);
+    socket.removeAllListeners('SEND_MESSAGE', onConnect);
+  });
+  socket.on('SEND_MESSAGE', (data) => {
+    console.log(data);
+    io.emit('RECEIVE_MESSAGE', data);
+  });
+  socket.on('disconnect', () => {
+    console.log('disconnect');
+    socket.removeAllListeners('SEND_MESSAGE', onConnect);
+  });
+};
 
 server.route(routes());
 // eslint-disable-next-line import/order
 const io = require('socket.io')(server.listener);
 
-io.on('connection', (socket) => {
-  console.log('connected', socket.id);
-  socket.on('NEW USER', (data) => {
-    if (!listOfAllActiveUsers.includes(data.username)) {
-      listOfAllActiveUsers.push(data.username);
-      io.emit('LIST OF ACTIVE USERS', listOfAllActiveUsers);
-    }
-  });
-
-  socket.on('USER DISCONNECTED', (data) => {
-    console.log('USER DISCONNECTED', data);
-    listOfAllActiveUsers = listOfAllActiveUsers.filter(user => user !== data.username);
-    io.emit('LIST OF ACTIVE USERS', listOfAllActiveUsers);
-  });
-
-  socket.on('SEND_MESSAGE', (data) => {
-    io.emit('RECEIVE_MESSAGE', data);
-  });
+io.sockets.on('connection', (socket) => {
+  console.log('connected');
+  onConnect(socket, io);
 });
 
 
