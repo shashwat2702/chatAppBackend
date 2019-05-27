@@ -1,5 +1,6 @@
 const Hapi = require('@hapi/hapi');
 const routes = require('./routes/index');
+const getEmotion = require('./sentimentAnalyzer');
 
 const server = Hapi.server({
   host: '0.0.0.0',
@@ -21,7 +22,7 @@ const onConnect = (socket, io) => {
     socket.removeAllListeners('SEND_MESSAGE', onConnect);
   });
   socket.on('SEND_MESSAGE', (data) => {
-    console.log(data);
+    console.log(getEmotion(data));
     io.emit('RECEIVE_MESSAGE', data);
   });
   socket.on('disconnect', () => {
