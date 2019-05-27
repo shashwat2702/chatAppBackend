@@ -1,6 +1,7 @@
 const Hapi = require('@hapi/hapi');
 const routes = require('./routes/index');
 const getEmotion = require('./sentimentAnalyzer');
+const getEmoji = require('./emotionMatcher');
 
 const server = Hapi.server({
   host: '0.0.0.0',
@@ -8,6 +9,15 @@ const server = Hapi.server({
   routes: { cors: true },
 });
 let listOfAllActiveUsers = [];
+const comparatorForSorting = (firstObject, secondObject) => {
+  if (firstObject.score > secondObject.score) {
+    return -1;
+  } if (firstObject.score < secondObject.score) {
+    return 1;
+  }
+  return 0;
+};
+
 const onConnect = (socket, io) => {
   socket.on('NEW USER', (data) => {
     console.log('NEW USER', data);
@@ -21,9 +31,17 @@ const onConnect = (socket, io) => {
     io.emit('LIST OF ACTIVE USERS', listOfAllActiveUsers);
     socket.removeAllListeners('SEND_MESSAGE', onConnect);
   });
-  socket.on('SEND_MESSAGE', (data) => {
-    console.log(getEmotion(data));
-    io.emit('RECEIVE_MESSAGE', data);
+  socket.on('SEND_MESSAGE', async (data) => {
+    const { author, message } = data;
+    const em = await getEmotion(message);
+    const JSONResponseArray = JSON.parse(em).document_tone.tones;
+    JSONResponseArray.sort(comparatorForSorting);
+    console.log('EMOTION', data, JSONResponseArray);
+    const responseObject = {
+      author,
+      message: `${message}${' '}${getEmoji((JSONResponseArray[0]) ? JSONResponseArray[0].tone_id : 'okay')}`,
+    };
+    io.emit('RECEIVE_MESSAGE', responseObject);
   });
   socket.on('disconnect', () => {
     console.log('disconnect');
