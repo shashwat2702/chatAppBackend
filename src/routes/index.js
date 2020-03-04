@@ -3,6 +3,8 @@ const register = require('./register');
 const checkUserName = require('./checkUserName');
 const login = require('./login');
 const checkEmail = require('./checkEmail');
+const getInteraction = require('./getInteraction');
+const addInteraction = require('./addInteraction');
 
 module.exports = () => [].concat(
   ping,
@@ -10,4 +12,6 @@ module.exports = () => [].concat(
   checkUserName,
   login,
   checkEmail,
+  getInteraction,
+  addInteraction,
 );
